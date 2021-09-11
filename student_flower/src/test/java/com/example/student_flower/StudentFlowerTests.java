@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.concurrent.TimeUnit;
 
 
-@SpringBootTest //loads complete application context - for integration test
+@SpringBootTest
 @AutoConfigureMockMvc
 class StudentFlowerTests {
 
