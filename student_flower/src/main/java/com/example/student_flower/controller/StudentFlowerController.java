@@ -1,5 +1,6 @@
 package com.example.student_flower.controller;
 
+import com.example.student_flower.common.anotation.MyAnotation;
 import com.example.student_flower.service.StudentFlowerService;
 import com.sun.istack.internal.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ public class StudentFlowerController {
      * @param classroomId 教师ID
      * @param studentId 学生ID
      */
+    @MyAnotation(redisKey = "/test/sendflower", params = {"classroomId", "studentId"})
     @GetMapping(value = "/test/sendflower/{classroomId}/{studentId}")
     public void sendFlower(@NotNull  @PathVariable("classroomId") Long classroomId , @NotNull @PathVariable("studentId") Long studentId){
         studentFlowerService.SendFlower(classroomId,studentId);

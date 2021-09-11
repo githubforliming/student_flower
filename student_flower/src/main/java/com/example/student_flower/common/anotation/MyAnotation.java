@@ -16,6 +16,11 @@ import java.lang.annotation.Target;
 public @interface MyAnotation {
 
     /**
+     * 获取锁时默认等待多久
+     */
+    int waitTime() default 3;
+
+    /**
      * 锁过期时间
      */
     int expireTime() default 20;

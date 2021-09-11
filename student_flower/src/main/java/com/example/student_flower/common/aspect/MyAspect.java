@@ -1,6 +1,7 @@
 package com.example.student_flower.common.aspect;
 
 import com.example.student_flower.common.anotation.MyAnotation;
+import com.example.student_flower.util.HttpContextUtils;
 import com.example.student_flower.util.SpelUtil;
 import io.micrometer.core.instrument.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -9,10 +10,14 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author 发现更多精彩  关注公众号：木子的昼夜编程
@@ -26,6 +31,9 @@ import java.lang.reflect.Method;
 @Aspect
 @Component
 public class MyAspect {
+
+    @Autowired
+    RedissonClient redissonClient;
 
     // 这个是那些方法需要被切 -- 被标记注解MyAnotation的方法要被切
     @Pointcut("@annotation(com.example.student_flower.common.anotation.MyAnotation)")
@@ -41,58 +49,55 @@ public class MyAspect {
         // 1. 获取注解
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
-        MyAnotation ide = method.getAnnotation(MyAnotation.class);
+        MyAnotation myAnotation = method.getAnnotation(MyAnotation.class);
 
+        // 2. 锁等待时间
+        int waitTime = myAnotation.waitTime();
         // 2. 锁超时时间 怕万一finally没有被执行到的时候 多长时间自动释放锁（基本不会不执行finnaly 除非那个点机器down了）
-        final int lockSeconds = ide.expireTime();
+        final int lockSeconds = myAnotation.expireTime();
         // 3. 特殊业务自定义key
-        String key = ide.redisKey();
+        String key = myAnotation.redisKey();
         // 自定义redisKey是否使用参数
-        String[] params = ide.params();
+        String[] params = myAnotation.params();
         // 4.获取HttpServletRequest
-        HttpServletRequest request = HttpContextUtils.getHttpServletRequest();
-        Asserts.checkNotNull(request, "request can not null");
+        HttpServletRequest request = HttpContextUtils.getRequest();
+        if (request == null) {
+            throw new Exception("错误的请求 request为null");
+        }
         assert request != null;
-        // 如果没有自定义key 需要按照规则生成key
+
+        // 5. 组合redis锁key
+        // 5.1 如果没有自定义 用默认的 url+token
         if (StringUtils.isBlank(key) && (params == null || params.length == 0)) {
+            // 这里怎么获取token 主要看自己项目用的什么框架 token在哪个位置存储着
             String token = request.getHeader("Authorization");
             String requestURI = request.getRequestURI();
-            log.info("tryLock success, token = [{}], requestURI = [{}]", token, requestURI);
-            key = getIdeKey(token, requestURI);
+            key = requestURI+token;
         } else {
-            // 解析表达式
+            // 5.2 自定义key
             key = SpelUtil.generateKeyBySpEL(key, params, joinPoint);
         }
-        // 3 秒内默认请求
-        int tryLock = 3;
-        // 获取锁 获取不到最多等3秒 lockSeconds秒后自动释放锁
-        boolean b = RedissonLockUtil.tryLock(key, tryLock, lockSeconds);
+        // 6. 获取key
+        // 获取锁 获取不到最多等waitTime秒 lockSeconds秒后自动释放锁
+        // 每个项目组应该会有自己的redisUtil的封装 我这里就用最简单的方式
+        // 怎么使用锁不是重点 重点是这个思想
+        RLock lock = redissonClient.getLock(key);
         log.info("tryLock key = {}", key);
+        boolean b = lock.tryLock(waitTime, lockSeconds, TimeUnit.SECONDS);
+        // 获取锁成功
         if (b) {
-            log.info("tryLock success, key = {}", key);
-            // 获取锁成功
-            Object result;
             try {
-                // 执行进程
-                result = joinPoint.proceed();
+                log.info("tryLock success, key = {}", key);
+                // 7. 执行业务代码 返回结果
+                return joinPoint.proceed();
             } finally {
-                // 解锁q
-                RedissonLockUtil.unlock(key);
-                log.info("releaseLock success, key = {}", key);
+                lock.unlock();
             }
-            return result;
         } else {
-            // 获取锁失败，认为是重复提交的请求
+            // 获取锁失败
             log.info("tryLock fail, key = {}", key);
-            log.info("tryLock fail, key = {}", "重复请求，请稍后再试!");
-            Asserts.assertExpression(false, ErrorCode.BAD_REQUEST, "重复请求，请稍后重试！");
-
+            throw new Exception("请求频繁，请稍后重试");
         }
-        return null;
     }
 
-    // 获取key
-    private String getIdeKey(String token, String requestURI) {
-        return token + requestURI;
-    }
 }
