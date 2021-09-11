@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.PersonMapper02">
+    <!--
+     eviction:FIFO 淘汰策略先进先出  flushInterval:60000 缓存60秒刷新一次
+     size:512 最多存储512个缓存对象 readOnly:true 设置为只读 返回结果如果进行修改就会报错-->
+    <cache
+            eviction="FIFO"
+            flushInterval="60000"
+            size="512"
+            readOnly="true"/>
+    <!--查询-->
+    <select id="list" resultType="person" >
+        select a.* from person a
+    </select>
+</mapper>

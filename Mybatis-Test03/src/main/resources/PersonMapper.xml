@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.PersonMapper">
+    <resultMap id="personResultMap" type="entity.Person">
+        <!--构造函数-->
+        <constructor>
+            <idArg column="id" jdbcType="BIGINT" javaType="long"/>
+            <arg column="name" jdbcType="VARCHAR" javaType="string"/>
+        </constructor>
+        <!--普通属性-->
+        <result property="jobName" column="job_name" jdbcType="VARCHAR" javaType="string"/>
+        <result property="salary" column="salary" jdbcType="DECIMAL"  javaType="decimal"/>
+        <!--集合 column指定映射参数 把id映射成pid 在子查询中就可以使用了-->
+        <collection property="mobiles" javaType="java.util.List" ofType="entity.Mobile"
+        select="listMobile" column="{pid=id}"
+        />
+        <!--根据年龄来判断展示什么属性-->
+        <discriminator javaType="int" column="age">
+            <!--年龄16 值显示爱好-->
+            <case value="16"  resultType="entity.Person">
+                <result column="hobby" property="hobby" javaType="string" jdbcType="VARCHAR"/>
+            </case>
+            <!--年龄19 显示年龄 性别 爱好 住址-->
+            <case value="19" resultType="entity.Person">
+                <result column="age" property="age" javaType="int" jdbcType="INTEGER"/>
+                <result column="gender" property="gender" javaType="string" jdbcType="VARCHAR"/>
+                <result column="hobby" property="hobby" javaType="string" jdbcType="VARCHAR"/>
+                <result column="address" property="address" javaType="string" jdbcType="VARCHAR"/>
+            </case>
+        </discriminator>
+    </resultMap>
+    <select id="listMobile" resultType="entity.Mobile">
+        select p_id pId, mobile , isp
+        from mobile where p_id =#{pid}
+    </select>
+    <!--查询-->   
+    <select id="list" resultMap="personResultMap">
+        select a.* from person a
+
+    </select>
+
+    <select id="testMap" resultType="entity.Person">
+        select * from person a where 1=1
+        <if test="pmap != null and  pmap.keySet().size() > 0">
+            and name in
+            <foreach collection="pmap.keySet()"  item="key" open="(" close=")" separator=",">
+                #{pmap[${key}]}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="testChoose" resultType="entity.Person">
+        select * from person
+        <trim prefix="where" prefixOverrides="and |or">
+            <if test='name != null and name !=""'>
+                name = #{name}
+            </if>
+            <if test="age != null">
+                and age = #{age}
+            </if>
+        </trim>
+
+    </select>
+
+    <!--测试bind-->
+    <select id="testBind" resultType="entity.Person">
+        <bind name="bidname" value="'%'+name+'%'" />
+        select * from person where name like #{bidname}
+    </select>
+
+    <!--选择不同的数据库-->
+    <select id="testDb" resultType="string" >
+        <if test="_databaseId == mysql">
+            select #{_databaseId}
+        </if>
+
+    </select>
+
+</mapper>

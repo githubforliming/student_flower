@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.student_flower.dao.TStudentFlowerMapper">
+    <!--新增-->
+    <insert id="insert" parameterType="TStudentFlower">
+        INSERT INTO t_student_flower (classroom_id,student_id,flower_num)
+        VALUES  (#{classroomId},#{studentId},#{flowerNum})
+    </insert>
+
+    <!--更新-->
+    <update id="update" parameterType="TStudentFlower">
+        UPDATE t_student_flower
+        SET flower_num = #{flowerNum}
+        WHERE id=#{id};
+    </update>
+
+    <select id="selectByClassroomIdAndStudentId"
+            resultType="TStudentFlower">
+        select * from t_student_flower
+        where classroom_id = #{classroomId} and student_id = #{studentId}
+    </select>
+</mapper>

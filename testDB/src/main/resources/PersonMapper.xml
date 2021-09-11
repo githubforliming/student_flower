@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.PersonMapper">
+    <!--选择不同的数据库-->
+    <!--mysql-->
+    <select id="testDb" resultType="string" databaseId="mysql">
+        select "mysql" from dual
+    </select>
+    <!--oracle-->
+    <select id="testDb" resultType="string" databaseId="oracle">
+            select "oracle"
+    </select>
+    <!--其他-->
+    <select id="testDb" resultType="string" databaseId="">
+        select "其他"
+    </select>
+
+</mapper>

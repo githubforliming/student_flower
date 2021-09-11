@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.TestMapper">
+    
+    <resultMap id="testResultMap" type="testentity">
+        <constructor>
+            <arg></arg>
+        </constructor>
+        <id property="id" column="id" javaType="long" jdbcType="BIGINT"/>
+        <result property="name" column="name" javaType="string" jdbcType="VARCHAR"/>
+        <result property="age" column="name" javaType="int" jdbcType="INTEGER"/>
+        <result property="salary" column="name" javaType="decimal" jdbcType="DECIMAL"/>
+    </resultMap>
+    
+    <select id="list" resultType="testentity">
+        select
+            id as id
+            name as name
+            age as age
+            course_date as courseDate
+        from test
+    </select>
+    <!--增加-->
+    <delete id="save">
+        INSERT INTO `test`(`id`, `name`, `salary`) VALUE (#{id},#{name}, #{salary})
+    </delete>
+
+    <!--删除-->
+    <delete id="delete">
+        delete from test where id = #{id}
+    </delete>
+
+    <!--根据主键查询-->
+    <select id="get" resultType="testEntity" parameterType="int">
+        select * from test where id = #{id}
+    </select>
+
+    <!--查询所有数据-->
+    <select id="list"  resultType="entity.TestEntity">
+        select * from test
+    </select>
+
+    <!--根据名称模糊查询-->
+    <select id="listByNameLike" resultType="entity.TestEntity">
+        select * from test  where name like CONCAT('%',#{name},'%')
+    </select>
+
+    <update id="update">
+        update test set name =#{name}, salary = #{salary} where id = #{id}
+    </update>
+
+    <!--根据名称和年龄查寻-->
+    <select id="listByNameAndAge" resultType="testentity">
+        select * from test
+        where 1=1
+        <if test="name != null">
+            and name like CONCAT('%',#{name},'%')
+        </if>
+        <if test="age != null">
+            and age = #{age}
+        </if>
+    </select>
+
+    <!--param多参数map使用-->
+    <select id="listByNameAndAgeMap" resultType="testentity">
+        select * from test
+        where 1=1
+        <if test="name != null">
+            and name like CONCAT('%',#{name},'%')
+        </if>
+        <if test="age != null">
+            and age = #{age}
+        </if>
+    </select>
+
+    <!--用默认顺序-->
+    <select id="listByNameAndAgeNone" resultType="testentity">
+        select * from test
+        where 1=1
+        <if test="param1 != null">
+            and name like CONCAT('%',#{param1},'%')
+        </if>
+        <if test="param2 != null">
+            and age = #{param2}
+        </if>
+    </select>
+
+    <select id="listByAges" resultType="testentity">
+        select * from test
+        where 1=1 
+       <if test="array != null and array.length >0">
+           and age in 
+           <foreach collection="array" item="age" open="(" separator="," close=")">
+                #{age}
+           </foreach>
+       </if>
+    </select>
+
+    <select id="listByNameAndAges" resultType="testentity">
+        select * from test
+        where 1=1
+        <if test="array != null and array.length >0">
+            and (
+            <foreach collection="array" item="item"  separator="or" >
+                (name = #{item.name} and age = #{item.age})
+            </foreach>
+            )
+        </if>
+    </select>
+
+    <select id="listByNameAndAgesList" resultType="testentity">
+        select * from test
+        where 1=1
+        <if test="list != null and list.size() >0">
+            and (
+            <foreach collection="list" item="item"  separator="or" >
+                (name = #{item.name} and age = #{item.age})
+            </foreach>
+            )
+        </if>
+    </select>
+
+    <!--#{} 查询数据-->
+    <select id="listByName01" resultType="testentity">
+        select * from test where name = #{name}
+    </select>
+
+    <!--${} 查询数据-->
+    <select id="listByName02" resultType="testentity">
+        select * from test where name = ${name}
+    </select>
+</mapper>
