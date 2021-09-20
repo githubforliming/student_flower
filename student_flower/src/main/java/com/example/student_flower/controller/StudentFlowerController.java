@@ -4,9 +4,7 @@ import com.example.student_flower.common.anotation.MyAnotation;
 import com.example.student_flower.service.StudentFlowerService;
 import com.sun.istack.internal.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author 发现更多精彩  关注公众号：木子的昼夜编程
@@ -28,5 +26,12 @@ public class StudentFlowerController {
     @GetMapping(value = "/test/sendflower/{classroomId}/{studentId}")
     public void sendFlower(@NotNull  @PathVariable("classroomId") Long classroomId , @NotNull @PathVariable("studentId") Long studentId){
         studentFlowerService.SendFlower(classroomId,studentId);
+    }
+
+
+    @MyAnotation(redisKey = "/test/sendflower", params = {"p.id"})
+    @PostMapping(value = "/test/sendflower02")
+    public void sendFlower(@RequestBody Person p){
+        // xxx
     }
 }
