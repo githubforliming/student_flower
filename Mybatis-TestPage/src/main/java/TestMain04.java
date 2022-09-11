@@ -1,35 +1,36 @@
 import dao.TestMapper;
 import entity.TestEntity;
 import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
-import javax.sql.DataSource;
 import java.io.InputStream;
 import java.util.List;
 
 /**
  * @author 发现更多精彩  关注公众号：木子的昼夜编程
  * 一个生活在互联网底层，做着增删改查的码农,不谙世事的造作
- * @create 2021-08-25
  */
-public class TestMain {
+public class TestMain04 {
     public static void main(String[] args) throws Exception {
-        // 1. mybatis 配置文件
         String resource = "mybatis-config.xml";
-        // 2. 获取输入流
         InputStream inputStream = Resources.getResourceAsStream(resource);
-        // 3. 创建SqlSessionFactory工厂 这一步会进行Mapper的动态代理操作
         SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-        // 4. 创建SqlSession
         try (SqlSession session = sqlSessionFactory.openSession()) {
-            // 5. 通过sesson获取Mapper 这个Mapper会编程Mybatis的代理Mapper
+            // 通过sesson获取Mapper 这个Mapper会编程Mybatis的代理Mapper
             TestMapper mapper = session.getMapper(TestMapper.class);
-            // 6. 调用方法
-            mapper.delete(1L);
-            // 7. 手动提交
-            session.commit();
+            // offset偏移量从0开始  limit一共查几条
+            Integer pageNum =1; // 当前页(一般与前端交互 就迁就一下他们 页数从1开始)
+            Integer pageSize = 10; // 每页大小
+            // 分页参数错误判断就先不判断了 根据业务自己判断
+            //
+            RowBounds rd = new RowBounds((pageNum-1)*pageSize,pageSize);
+            List<TestEntity> res = mapper.selectRowBounds(rd);
+            for (int i = 0; i < res.size(); i++) {
+                System.out.println(res.get(i));
+            }
         }
     }
 }

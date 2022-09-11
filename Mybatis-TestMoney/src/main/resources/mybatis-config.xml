@@ -15,6 +15,6 @@
         </environment>
     </environments>
     <mappers>
-        <mapper resource="TestMapper.xml"/>
+        <mapper class="dao.ProductMapper"/>
     </mappers>
 </configuration>

@@ -1,5 +1,7 @@
 package entity;
 
+import org.joda.money.Money;
+
 import java.math.BigDecimal;
 
 /**
@@ -8,5 +10,41 @@ import java.math.BigDecimal;
  * @create 2021-08-25 22:05
  */
 public class Product {
+    private Integer id;
+    private String name;
+    private Money price;
 
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Money getPrice() {
+        return price;
+    }
+
+    public void setPrice(Money price) {
+        this.price = price;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", price=" + price.getAmount()+ "元" +
+                '}';
+    }
 }

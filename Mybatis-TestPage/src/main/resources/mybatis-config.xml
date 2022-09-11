@@ -3,6 +3,23 @@
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
+    <settings>
+        <setting name="logImpl" value="LOG4J"/>
+    </settings>
+    <!--扫描包路径-->
+    <typeAliases>
+        <package name="entity"/>
+    </typeAliases>
+    <!--自定义拦截器-->
+    <plugins>
+        <!-- com.github.pagehelper为PageHelper类所在包名 -->
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!-- 使用下面的方式配置参数，后面会有所有的参数介绍 -->
+            <property name="supportMethodsArguments" value="true"/>
+            <property name="params" value="pageNum=myPageNum;pageSize=myPageSize;"/>
+        </plugin>
+    </plugins>
+
     <environments default="development">
         <environment id="development">
             <transactionManager type="JDBC"/>
@@ -14,7 +31,10 @@
             </dataSource>
         </environment>
     </environments>
+    <!--扫描-->
     <mappers>
-        <mapper class="dao.ProductMapper"/>
+        <mapper class="dao.TestMapper"/>
     </mappers>
+
 </configuration>
+
