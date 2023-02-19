@@ -1,0 +1,57 @@
+package rules;
+
+// 引入实体
+import com.example.droolstest02.entity.SalienceEntity;
+
+
+// 编写规则
+rule "att_salience_0"
+    salience 0
+    when
+        SalienceEntity(yesOrNo == true)
+    then
+        System.out.println("优先级saience=0");
+end
+
+// 编写规则
+rule "att_salience_default"
+    when
+        SalienceEntity(yesOrNo == true)
+    then
+        System.out.println("默认优先级");
+end
+
+// 编写规则
+rule "att_salience_1"
+    salience 1
+    when
+        SalienceEntity(yesOrNo == true)
+    then
+        System.out.println("优先级saience=1");
+end
+
+rule "att_salience_-10"
+    salience -10
+    when
+        SalienceEntity(yesOrNo == true)
+    then
+        System.out.println("优先级saience=-10");
+end
+
+// 编写规则
+rule "att_salience_2-01"
+    salience 2
+    when
+        SalienceEntity(yesOrNo == true)
+    then
+        System.out.println("优先级saience=2-01");
+end
+
+// 编写规则
+rule "att_salience_2-02"
+    salience 2
+    when
+        SalienceEntity(yesOrNo == true)
+    then
+        System.out.println("优先级saience=2-02");
+end

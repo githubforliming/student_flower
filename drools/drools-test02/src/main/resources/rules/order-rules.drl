@@ -1,8 +1,10 @@
 package rules;
 
 // 引入实体
-import com.example.droolstest.entity.Order;
-import com.example.droolstest.entity.User;
+import com.example.droolstest02.entity.Order;
+import com.example.droolstest02.entity.User;
+
+
 
 // 编写规则
 rule "add0"
@@ -27,7 +29,6 @@ rule "add100"
         update($order)
 end
 
-// 添加500分
 rule "add500"
     no-loop true
     lock-on-active true
@@ -38,7 +39,7 @@ rule "add500"
         $order.setScore(500);
         update($order)
 end
-/*如果大于1000 就加1000分*/
+
 rule "add1000"
     no-loop true
     lock-on-active true

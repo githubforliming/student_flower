@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>微信公众号登录测试</title>
+</head>
+<style>
+    .mydiv{
+        text-align: center;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<!--引入静态的路径-->
+<!--<script type="text/javascript" src="js/vue.min.js"></script>-->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<!--<script type="text/javascript" src="js/index.js"></script>-->
+<!-- 引入样式 -->
+<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<!--<link rel="stylesheet" href="css/index.css">-->
+<!-- 引入组件库 -->
+<!--引入通信框架-->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<!--<script type="text/javascript" src="js/axios.min.js"></script>-->
+<body>
+<div id="app">
+    <div>
+        <el-form :inline="true" class="demo-form-inline">
+            <el-form-item>
+                <el-button type="primary"  @click="btnQuery">查询数据</el-button>
+                <el-button type="primary" @click="btnLogin">登录</el-button>
+            </el-form-item>
+        </el-form>
+        <!--添加对象-->
+        <el-dialog
+                title="扫码登录"
+                :visible.sync="centerDialogVisible"
+                width="20%"
+                center>
+            <div class="mydiv">
+                <img :src="imgsrc" style="width: 100%;" class="imagePreview"/>
+            </div>
+        </el-dialog>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    new Vue({
+        el: "#app",
+        //数据
+        data() {
+            return {
+                centerDialogVisible:false,
+                imgsrc:'',
+                ticket:''
+            }
+        },
+        //创建之前
+        created() {
+        },
+        //初始化加载数据
+        mounted() {
+        },
+        methods: {
+            //查询数据
+            btnQuery(){
+                let mytoken = localStorage.getItem('mytoken');
+                if (!mytoken) {
+                    // 简单起见 我们就用原生的弹窗
+                    alert("请先登录！")
+                    return ;
+                }
+                axios.post("/wx/getdata",
+                    // 参数
+                    {
+                        name: 'Evan',
+                        age: '18'
+                    },
+                    // 配置信息
+                    {
+                        // 请求头 一般我们会封装起来 不会这样用
+                        headers: {
+                            'mytoken': mytoken
+                        },
+
+                    }
+                ).then((res => {
+                    alert("获取到数据："+res.data);
+                })).catch((
+                    e =>{
+                        if (e.response.status == '401') {
+                            alert("请登录！");
+                        } else {
+                            alert("系统错误！");
+                        }
+                    }
+                ));
+            },
+
+            //登录
+            btnLogin(){
+                // 请求认证消息 是不需要token的 后台不需要做校验
+                axios.post("/wx/nologin/getqrcode").then((res => {
+                    this.imgsrc = res.data.img;
+                    this.ticket = res.data.ticket;
+                    // 开启监听 用websocket也可以 我这里就用轮训 万能轮训的大法
+                    let _this=this
+                    setTimeout(function(){
+                        _this.checkLogin();
+                    }, 1000);
+                }));
+                this.centerDialogVisible = true;
+            },
+            checkLogin(){
+                // 请求认证消息 是不需要token的 后台不需要做校验
+                axios.post("/wx/nologin/checklogin/",{
+                    ticket: this.ticket
+                }).then((res => {
+                   if (res.data != null && res.data != '') {
+                       // 已经扫码关注 或之前关注 现在扫码进入了
+                       this.centerDialogVisible = false;
+                       localStorage.setItem("mytoken", res.data);
+                       alert("登录成功！");
+                   } else {
+                       let _this=this
+                       setTimeout(function(){
+                           _this.checkLogin();
+                       }, 1000);
+                   }
+                }));
+            }
+        }
+
+    });
+</script>
+<style scoped>
+
+</style>

@@ -1,0 +1,31 @@
+package rules;
+
+// 引入实体
+import com.example.droolstest02.entity.TestNoneEntity;
+
+// 编写规则
+rule "att_date_effective_0"
+    date-effective "2022-09-24 12"
+    when
+        TestNoneEntity(str == "att_date_effective")
+    then
+        System.out.println("时间："+"2022-09-23");
+end
+
+// 编写规则
+rule "att_date_effective_2"
+    date-effective "2022-09-24 18"
+    when
+        TestNoneEntity(str == "att_date_effective")
+    then
+        System.out.println("时间："+"2022-09-24");
+end
+
+// 编写规则
+rule "att_date_effective_3"
+    date-effective "2022-09-25"
+    when
+        TestNoneEntity(str == "att_date_effective")
+    then
+        System.out.println("时间："+"2022-09-25");
+end

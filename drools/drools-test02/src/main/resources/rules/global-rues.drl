@@ -1,0 +1,27 @@
+package rules;
+
+// 引入实体
+import com.example.droolstest02.entity.TestNoneEntity;
+global java.lang.Integer count
+global java.util.List data
+// 编写规则
+rule "global_0"
+    when
+        $test:TestNoneEntity(str == "global")
+    then
+        System.out.println("count="+count);
+        System.out.println("data="+data);
+        count = count+1;
+        data.add("003");
+        data.add("004");
+end
+
+
+// 编写规则
+rule "global_1"
+    when
+        $test:TestNoneEntity(str == "global")
+    then
+        System.out.println("修改后输出，count="+count);
+        System.out.println("修改后输出，data="+data);
+end

@@ -1,4 +1,4 @@
-package com.example.droolstest.entity;
+package com.example.droolstest02.entity;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

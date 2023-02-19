@@ -1,4 +1,4 @@
-package com.example.droolstest.entity;
+package com.example.droolstest02.entity;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -8,9 +8,6 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class User {
-    /**
-     * 姓名
-     */
-    private String name;
+public class SalienceEntity {
+    boolean yesOrNo;
 }

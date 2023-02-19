@@ -1,0 +1,30 @@
+package rules;
+
+// 引入实体
+import com.example.droolstest02.entity.TestNoneEntity;
+
+// 编写规则
+rule "att_lock_on_active_01"
+    no-loop true
+    lock-on-active true
+    when
+        $test:TestNoneEntity(str == "lockonactive01")
+    then
+        System.out.println("lockonactive01");
+        Thread.sleep(1000);
+        $test.setStr("lockonactive02");
+        update($test)
+end
+
+// 编写规则
+rule "att_lock_on_active_02"
+    no-loop true
+    lock-on-active true
+    when
+        $test:TestNoneEntity(str == "lockonactive02")
+    then
+        System.out.println("lockonactive02");
+        Thread.sleep(1000);
+        $test.setStr("lockonactive01");
+        update($test)
+end

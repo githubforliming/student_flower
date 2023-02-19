@@ -1,0 +1,41 @@
+package rules;
+
+// 引入实体
+import com.example.droolstest02.entity.TestNoneEntity;
+
+// 编写规则
+rule "att_auto_focus_0"
+    auto-focus true
+    agenda-group "group001"
+    when
+        TestNoneEntity(str == "agendagroup")
+    then
+        System.out.println("att_auto_focus_0");
+end
+
+// 编写规则
+rule "att_auto_focus_1"
+    agenda-group "group001"
+    when
+        TestNoneEntity(str == "agendagroup")
+    then
+        System.out.println("att_auto_focus_1");
+end
+
+// 编写规则
+rule "att_auto_focus_2"
+    agenda-group "group001"
+    when
+        TestNoneEntity(str != "agendagroup")
+    then
+        System.out.println("att_auto_focus_2");
+end
+
+// 编写规则
+rule "att_auto_focus_3"
+    agenda-group "group001"
+    when
+        TestNoneEntity(str != "agendagroup")
+    then
+        System.out.println("att_auto_focus_3");
+end

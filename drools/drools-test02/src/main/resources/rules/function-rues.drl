@@ -1,0 +1,17 @@
+package rules;
+
+// 引入实体
+import com.example.droolstest02.entity.TestNoneEntity;
+
+function String cyf(String name){
+    return String.format("给%s穿衣服", name);
+}
+
+rule "function_001"
+    when
+        TestNoneEntity(str == "穿衣服")
+    then
+        String res = cyf("诸葛十三");
+        System.out.println("输出："+res);
+end
+

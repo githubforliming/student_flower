@@ -1,0 +1,21 @@
+package rules;
+
+// 引入实体
+import com.example.droolstest02.entity.TestNoneEntity;
+
+
+
+rule "lhsplus_extend_base"
+    when
+        $test01:TestNoneEntity(i > 50)
+    then
+
+end
+
+
+rule "lhsplus_extend_01" extends "lhsplus_extend_base"
+    when
+        $test02:TestNoneEntity(i < 400)
+    then
+        System.out.println("符合条件：$test01="+$test01.getI()+",$test02="+$test02.getI());
+end
